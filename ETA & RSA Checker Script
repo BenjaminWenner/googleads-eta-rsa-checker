@@ -1,0 +1,41 @@
+/********************
+ETA & RSA Checker
+Created by Benjamin Wenner, benjamin.wenner@protonmail.com
+MCC v1.0
+********************/
+
+var SPREADSHEET_URL = 'insert your spreadsheet url';
+var sheet = SpreadsheetApp.openByUrl(SPREADSHEET_URL).getActiveSheet();
+var account = MccApp.accounts().get();
+
+function main() { 
+ sheet.clearContents(); 
+ sheet.getRange("A1").setValue("Account ID");
+ sheet.getRange("B1").setValue("Account Name");
+ sheet.getRange("C1").setValue("Campaign");
+ sheet.getRange("D1").setValue("Ad groups");
+ sheet.getRange("E1").setValue("Number of RSA");
+ sheet.getRange("F1").setValue("Number of ETA");
+var accountIterator = MccApp.accounts().executeInParallel('RSA');
+}
+
+function RSA() {
+ var GetAdGroups = AdWordsApp.adGroups()
+ .withCondition('Status = ENABLED')
+ .withCondition("CampaignName DOES_NOT_CONTAIN_IGNORE_CASE 'dsa'")
+ .withCondition("CampaignName DOES_NOT_CONTAIN_IGNORE_CASE 'sitefeed'")
+ .withCondition("CampaignName DOES_NOT_CONTAIN_IGNORE_CASE 'seitenfeed'")
+ .withCondition("CampaignName DOES_NOT_CONTAIN_IGNORE_CASE 'dynamic'")
+ .withCondition("AdvertisingChannelType = SEARCH")
+ .withCondition('CampaignStatus = ENABLED')
+ .get();
+
+ for (var row = 2; GetAdGroups.hasNext(); row ++) { 
+var AdGroups = GetAdGroups.next();
+ var NumberOfRsa = AdGroups.ads().withCondition('Type=RESPONSIVE_SEARCH_AD').withCondition('Status = ENABLED').get().totalNumEntities();
+ var NumberOfEta = AdGroups.ads().withCondition('Type=EXPANDED_TEXT_AD').withCondition('Status = ENABLED').get().totalNumEntities();
+if (NumberOfEta > 0) {
+ sheet.appendRow( [AdWordsApp.currentAccount().getCustomerId(),AdWordsApp.currentAccount().getName(), AdGroups.getCampaign().getName(), AdGroups.getName(), NumberOfRsa ,NumberOfEta] );
+}
+ } 
+}
