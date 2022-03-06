@@ -1,13 +1,15 @@
-/********************
-ETA & RSA Checker
-Created by Benjamin Wenner, benjamin.wenner@protonmail.com
-MCC v1.0
-********************/
+// 
+// ETA & RSA Checker
+// Created by Benjamin Wenner, benjamin.wenner@protonmail.com
+// MCC v1.0
+//
 
+// Insert your google spreadsheet url below
 var SPREADSHEET_URL = 'insert your spreadsheet url';
 var sheet = SpreadsheetApp.openByUrl(SPREADSHEET_URL).getActiveSheet();
 var account = MccApp.accounts().get();
 
+// The function below will clear the sheet and name the columns we will be using
 function main() { 
  sheet.clearContents(); 
  sheet.getRange("A1").setValue("Account ID");
@@ -19,6 +21,7 @@ function main() {
 var accountIterator = MccApp.accounts().executeInParallel('RSA');
 }
 
+// We will now select our search adgroups. Feel free to add additional conditions to exlude certain campaigns. The conditions below were set to exlcude dynamic search ads and dynamic pagefeed ads.
 function RSA() {
  var GetAdGroups = AdWordsApp.adGroups()
  .withCondition('Status = ENABLED')
